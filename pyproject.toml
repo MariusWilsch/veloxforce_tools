@@ -1,0 +1,42 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "openrouter-tools"
+version = "0.3.0"
+description = "Tools for working with OpenRouter and Langfuse APIs"
+authors = ["Marius Wilsch <marius.santiago.wilsch@gmail.com>"]
+readme = "README.md"
+license = "MIT"
+repository = "https://github.com/MariusWilsch/openrouter-tools"
+packages = [{include = "openrouter_tools"}]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<4.0"
+httpx = "*"
+pydantic = "*"
+tenacity = "*"
+rich = "*"
+pydantic-settings = "*"
+openai = "^1.76.0"
+langfuse = "^2.60.3"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "*"
+pytest-asyncio = "*"
+black = "*"
+isort = "*"
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+asyncio_mode = "auto"
