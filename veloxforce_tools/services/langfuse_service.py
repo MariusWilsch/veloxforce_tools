@@ -2,8 +2,8 @@ import os
 from typing import Dict, Any, Optional
 from langfuse import Langfuse
 
-from openrouter_tools.core.logger import get_logger
-from openrouter_tools.core.settings import get_settings
+from veloxforce_tools.core.logger import get_logger
+from veloxforce_tools.core.settings import get_settings
 
 # Get a configured logger
 logger = get_logger(__name__)

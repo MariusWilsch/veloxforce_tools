@@ -3,14 +3,14 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "openrouter-tools"
-version = "0.3.1"
-description = "Tools for working with OpenRouter and Langfuse APIs"
+name = "veloxforce-tools"
+version = "0.4.0"
+description = "Veloxforce Tools - A toolkit for working with OpenRouter, Langfuse, and Email APIs"
 authors = ["Marius Wilsch <marius.santiago.wilsch@gmail.com>"]
 readme = "README.md"
 license = "MIT"
-repository = "https://github.com/MariusWilsch/openrouter-tools"
-packages = [{include = "openrouter_tools", from = "."}, {include = "openrouter_tools/py.typed"}]
+repository = "https://github.com/MariusWilsch/veloxforce-tools"
+packages = [{include = "veloxforce_tools", from = "."}, {include = "veloxforce_tools/py.typed"}]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
@@ -21,6 +21,7 @@ rich = "*"
 pydantic-settings = "*"
 openai = "^1.76.0"
 langfuse = "^2.60.3"
+imap-tools = "^1.0.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"

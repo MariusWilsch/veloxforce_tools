@@ -1,5 +1,5 @@
 """
-Settings for OpenRouter Tools.
+Settings for Veloxforce Tools.
 """
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -9,7 +9,7 @@ from functools import lru_cache
 
 class Settings(BaseSettings):
     """
-    Settings for OpenRouter Tools.
+    Settings for Veloxforce Tools.
 
     Attributes:
         env: Environment (DEVELOPMENT or PRODUCTION)

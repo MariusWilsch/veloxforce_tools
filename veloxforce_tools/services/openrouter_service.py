@@ -6,10 +6,10 @@ from typing import Optional, Dict, List, Type, TypeVar, Any, Union, Literal
 from pydantic import BaseModel
 from tenacity import retry, stop_after_attempt, wait_exponential
 from langfuse.openai import AsyncOpenAI
-from langfuse.openai.types.chat import ChatCompletion, ChatCompletionMessageParam
+from openai.types.chat import ChatCompletion, ChatCompletionMessageParam
 
-from openrouter_tools.core.logger import get_logger
-from openrouter_tools.core.settings import get_settings
+from veloxforce_tools.core.logger import get_logger
+from veloxforce_tools.core.settings import get_settings
 
 # Get a configured logger
 logger = get_logger(__name__)

@@ -3,14 +3,14 @@ import copy
 import re
 from typing import List, Optional, Dict, Any
 
-from openrouter_tools.schemas.openrouter import (
+from veloxforce_tools.schemas.openrouter import (
     Message,
     TextContent,
     ImageUrlContent,
     FileContent,
 )
 
-from openrouter_tools.core.logger import get_logger
+from veloxforce_tools.core.logger import get_logger
 
 # Get a configured logger
 logger = get_logger(__name__)

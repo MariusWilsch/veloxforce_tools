@@ -1,5 +1,5 @@
 """
-Basic Rich logging configuration for OpenRouter Tools.
+Basic Rich logging configuration for Veloxforce Tools.
 """
 
 import logging
@@ -8,7 +8,7 @@ from rich.logging import RichHandler
 from rich.console import Console
 
 # Import settings using relative import to avoid circular imports
-from openrouter_tools.core.settings import get_settings
+from veloxforce_tools.core.settings import get_settings
 
 
 def configure_logging():

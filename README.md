@@ -1,24 +1,47 @@
-# OpenRouter Tools
+# Veloxforce Tools
 
-A toolkit for working with OpenRouter and Langfuse APIs, providing easy message building and API interaction.
+A toolkit for working with OpenRouter, Langfuse, and Email APIs, providing easy message building, API interaction, and email management.
 
 ## Installation
 
 ```bash
 # Install from local directory with pip
-pip install -e /path/to/openrouter-tools
+pip install -e /path/to/veloxforce-tools
 
 # Or with poetry (recommended)
-poetry add /path/to/openrouter-tools
+poetry add /path/to/veloxforce-tools
 
 # For development
-git clone https://github.com/MariusWilsch/openrouter-tools.git
-cd openrouter-tools
+git clone https://github.com/MariusWilsch/veloxforce-tools.git
+cd veloxforce-tools
 poetry install  # Installs the package and all dependencies
 poetry install --with dev  # Includes development dependencies
 ```
 
 ## Components
+
+### EmailService
+
+Handles email operations using IMAP:
+
+```python
+# Initialize the service
+email_service = EmailService(
+    imap_server="imap.example.com",
+    email_address="your_email@example.com",
+    password="your_password",
+    folder="INBOX"  # Optional, defaults to "INBOX"
+)
+
+# Fetch emails by their IDs
+emails = await email_service.fetch_emails_by_ids(["123", "456"])
+
+# Move an email to a different folder
+success = await email_service.move_email_to_folder("123", "Processed")
+
+# List all available folders
+folders = await email_service.list_folders()
+```
 
 ### MessageBuilder
 
@@ -100,18 +123,32 @@ formatted_prompt = langfuse_service.compile_prompt(
 # Initialize services
 openrouter_service = OpenRouterService(api_key="your_api_key")
 langfuse_service = LangfuseService(public_key="your_public_key", secret_key="your_secret_key")
+email_service = EmailService(
+    imap_server="imap.example.com",
+    email_address="your_email@example.com",
+    password="your_password"
+)
+
+# Fetch emails
+emails = await email_service.fetch_emails_by_ids(["123"])
+email = emails[0]
 
 # Get and format a prompt
 prompt_template = langfuse_service.get_text_prompt("document_analysis")
 formatted_prompt = langfuse_service.compile_prompt(
     prompt=prompt_template,
-    variables={"DOCUMENT_TYPE": "invoice"}
+    variables={
+        "DOCUMENT_TYPE": "invoice",
+        "EMAIL_SUBJECT": email.subject,
+        "EMAIL_BODY": email.text
+    }
 )
 
-# Build messages
+# Build messages with PDF attachments
+pdf_data = ["data:application/pdf;base64,ABC123..."]  # From email attachments
 messages = MessageBuilder.build_messages(
     prompt=formatted_prompt,
-    pdf_data=["data:application/pdf;base64,ABC123..."]
+    pdf_data=pdf_data
 )
 
 # Call OpenRouter
@@ -119,18 +156,21 @@ response = openrouter_service.chat_completion(
     messages=messages,
     model="anthropic/claude-3-opus"
 )
+
+# Move the processed email to a different folder
+await email_service.move_email_to_folder(email.uid, "Processed")
 ```
 
 ## Environment Configuration
 
-OpenRouter Tools uses Pydantic Settings for environment-based configuration:
+Veloxforce Tools uses Pydantic Settings for environment-based configuration:
 
 ### Setting Up Environment
 
 Create a `.env` file in your project root:
 
 ```
-# OpenRouter Tools Environment Configuration
+# Veloxforce Tools Environment Configuration
 
 # Environment: DEVELOPMENT or PRODUCTION
 ENV=DEVELOPMENT
@@ -141,6 +181,12 @@ OPENROUTER_API_KEY=your_openrouter_api_key_here
 # Optional: Langfuse API Keys (if using Langfuse)
 # LANGFUSE_PUBLIC_KEY=your_langfuse_public_key_here
 # LANGFUSE_SECRET_KEY=your_langfuse_secret_key_here
+
+# Optional: Email Configuration (if using EmailService)
+# IMAP_SERVER=imap.example.com
+# EMAIL_ADDRESS=your_email@example.com
+# EMAIL_PASSWORD=your_password
+# EMAIL_FOLDER=INBOX
 
 # Logging
 LOG_LEVEL=INFO
@@ -163,14 +209,14 @@ set OPENROUTER_API_KEY=your-api-key
 
 ### Using as a Package in Other Projects
 
-When using OpenRouter Tools as a package in other projects, you have two options:
+When using Veloxforce Tools as a package in other projects, you have two options:
 
 1. **Environment Variables**: Set the required environment variables in your main project
 2. **Direct Configuration**: Pass API keys directly to the service constructors
 
 Example with direct configuration:
 ```python
-from openrouter_tools import OpenRouterService
+from veloxforce_tools import OpenRouterService
 
 # Initialize with explicit API key
 service = OpenRouterService(api_key="your-api-key")
@@ -179,7 +225,7 @@ service = OpenRouterService(api_key="your-api-key")
 Example with environment variables:
 ```python
 import os
-from openrouter_tools import OpenRouterService
+from veloxforce_tools import OpenRouterService
 
 # Use environment variable from parent project
 service = OpenRouterService(api_key=os.environ.get("OPENROUTER_API_KEY"))
@@ -198,6 +244,10 @@ service = OpenRouterService(api_key=os.environ.get("OPENROUTER_API_KEY"))
 | OPENROUTER_API_KEY | Your OpenRouter API key | None |
 | LANGFUSE_PUBLIC_KEY | Your Langfuse public key | None |
 | LANGFUSE_SECRET_KEY | Your Langfuse secret key | None |
+| IMAP_SERVER | IMAP server address for EmailService | None |
+| EMAIL_ADDRESS | Email address for EmailService | None |
+| EMAIL_PASSWORD | Email password for EmailService | None |
+| EMAIL_FOLDER | Default folder for EmailService | "INBOX" |
 | LOG_LEVEL | Logging level (DEBUG, INFO, WARNING, ERROR) | INFO |
 | MAX_RETRIES | Override the default retry count | Based on ENV |
 
@@ -207,7 +257,7 @@ The package includes a simple Rich-based logging system:
 
 ```python
 # Import the logging configuration
-from openrouter_tools.logger import get_logger
+from veloxforce_tools.core.logger import get_logger
 
 # Get a logger for your module
 logger = get_logger(__name__)
@@ -234,7 +284,7 @@ OpenRouter Tools includes comprehensive type annotations to improve developer ex
 Example of type annotations in action:
 
 ```python
-from openrouter_tools import OpenRouterService
+from veloxforce_tools import OpenRouterService
 
 # Your IDE will show parameter hints and return types
 service = OpenRouterService(api_key="your-api-key")
@@ -263,32 +313,37 @@ Benefits:
 
 ```bash
 # Install from PyPI (once published)
-# pip install openrouter-tools
+# pip install veloxforce-tools
 
 # Install from GitHub repository
-pip install git+https://github.com/MariusWilsch/openrouter-tools.git
+pip install git+https://github.com/MariusWilsch/veloxforce-tools.git
 
 # Or install from a local directory
-pip install -e /path/to/openrouter-tools
+pip install -e /path/to/veloxforce-tools
 
 # With Poetry (recommended)
-poetry add git+https://github.com/MariusWilsch/openrouter-tools.git
+poetry add git+https://github.com/MariusWilsch/veloxforce-tools.git
 # or from local directory
-poetry add /path/to/openrouter-tools
+poetry add /path/to/veloxforce-tools
 ```
 
 ### Usage
 
 ```python
 # Import the components
-from openrouter_tools import MessageBuilder, OpenRouterService, LangfuseService
+from veloxforce_tools import MessageBuilder, OpenRouterService, LangfuseService, EmailService
 
 # Initialize services with explicit API keys
 openrouter_service = OpenRouterService(api_key="your_api_key")
 langfuse_service = LangfuseService(public_key="your_public_key", secret_key="your_secret_key")
+email_service = EmailService(
+    imap_server="imap.example.com",
+    email_address="your_email@example.com",
+    password="your_password"
+)
 
 # Or use environment variables from .env file
-# Just create a .env file in your project with OPENROUTER_API_KEY=your_key
+# Just create a .env file in your project with the necessary variables
 openrouter_service = OpenRouterService()  # Will use OPENROUTER_API_KEY from .env
 
 # Use the services as shown in the examples above

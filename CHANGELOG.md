@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2025-04-30
+
+### Added
+- Renamed package from `openrouter-tools` to `veloxforce-tools`
+- Added EmailService for IMAP email operations
+- Added methods for fetching emails by ID
+- Added methods for moving emails between folders
+- Added methods for listing email folders
+- Added imap-tools dependency
+
+### Changed
+- Updated package description to reflect expanded functionality
+- Updated imports and documentation to use the new package name
+
 ## [0.3.1] - 2025-04-29
 
 ### Added
