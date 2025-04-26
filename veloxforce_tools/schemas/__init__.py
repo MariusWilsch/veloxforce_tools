@@ -1,6 +1,6 @@
-"""Schemas for OpenRouter Tools."""
+"""Schemas for Veloxforce Tools."""
 
-from openrouter_tools.schemas.openrouter import (
+from veloxforce_tools.schemas.openrouter import (
     Message,
     TextContent,
     ImageUrlContent,

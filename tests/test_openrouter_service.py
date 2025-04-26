@@ -4,8 +4,8 @@ import os
 import base64
 from pprint import pprint
 
-from openrouter_tools.services.openrouter_service import OpenRouterService
-from openrouter_tools.services.message_builder import MessageBuilder
+from veloxforce_tools.services.openrouter_service import OpenRouterService
+from veloxforce_tools.services.message_builder import MessageBuilder
 
 
 @pytest.mark.asyncio

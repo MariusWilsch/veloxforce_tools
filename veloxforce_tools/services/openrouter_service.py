@@ -120,13 +120,14 @@ class OpenRouterService:
             ```
         """
         try:
+            logger.info(f"Calling OpenRouter chat completion API with model {model}")
             response = await self.client.chat.completions.create(
                 messages=messages,
                 model=model,
                 temperature=temperature,
                 max_tokens=max_tokens,
             )
-            logger.info(f"Chat completion response: {response}")
+            logger.debug(f"Chat completion response: {response}")
             return response.choices[0].message.content
         except Exception as e:
             logger.error(f"Error in chat completion: {str(e)}")
