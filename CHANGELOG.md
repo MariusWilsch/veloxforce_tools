@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2025-04-29
+
+### Added
+- Added `py.typed` marker file for better type checking support
+- Enhanced type annotations throughout the codebase
+- Added detailed docstrings with examples for all public methods
+- Improved method signatures with more specific types
+- Added explicit error types in docstrings
+
+### Changed
+- Updated method return types to be more specific
+- Improved parameter type annotations
+- Enhanced documentation with usage examples
+
 ## [0.3.0] - 2025-04-28
 
 ### Added

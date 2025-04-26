@@ -1,10 +1,12 @@
 import json
 import httpx
 import base64
-from typing import Optional, Dict, List, Type, TypeVar, Any
+import re
+from typing import Optional, Dict, List, Type, TypeVar, Any, Union, Literal
 from pydantic import BaseModel
 from tenacity import retry, stop_after_attempt, wait_exponential
 from langfuse.openai import AsyncOpenAI
+from langfuse.openai.types.chat import ChatCompletion, ChatCompletionMessageParam
 
 from openrouter_tools.core.logger import get_logger
 from openrouter_tools.core.settings import get_settings
@@ -46,8 +48,10 @@ class OpenRouterService:
         """
         self.api_key = api_key or settings.OPENROUTER_API_KEY
         if not self.api_key:
-            raise ValueError("OpenRouter API key is required. Provide it directly or set OPENROUTER_API_KEY in environment variables or .env file.")
-            
+            raise ValueError(
+                "OpenRouter API key is required. Provide it directly or set OPENROUTER_API_KEY in environment variables or .env file."
+            )
+
         self.base_url = base_url
         self.site_url = site_url
         self.site_name = site_name
@@ -79,21 +83,41 @@ class OpenRouterService:
     )
     async def chat_completion(
         self,
-        messages: List[Dict],
+        messages: List[Dict[str, Any]],
         model: Optional[str] = None,
         temperature: Optional[float] = 0.0,
         max_tokens: Optional[int] = None,
-    ) -> Any:
+    ) -> str:
         """
         Generate a chat completion using OpenRouter.
 
         Args:
             messages: List of message dictionaries ready for the API
-            model: Model identifier (e.g., "openai/gpt-4o")
+            model: Model identifier (e.g., "openai/gpt-4o", "anthropic/claude-3-haiku")
             temperature: Sampling temperature (0-2)
             max_tokens: Maximum tokens to generate
+
         Returns:
-            OpenAI ChatCompletion object
+            str: The text response from the model
+
+        Raises:
+            ValueError: If the API key is missing
+            httpx.HTTPStatusError: If the API request fails
+            Exception: For other errors
+
+        Examples:
+            ```python
+            service = OpenRouterService(api_key="your-api-key")
+            messages = await MessageBuilder.build_messages(
+                prompt="What is the capital of France?",
+                system_prompt="Be concise."
+            )
+            result = await service.chat_completion(
+                messages=messages,
+                model="anthropic/claude-3-haiku"
+            )
+            print(result)  # "Paris."
+            ```
         """
         try:
             response = await self.client.chat.completions.create(
@@ -115,10 +139,10 @@ class OpenRouterService:
     )
     async def structured_output(
         self,
-        messages: List[Dict],
+        messages: List[Dict[str, Any]],
         schema_model: Type[T],
         model: Optional[str] = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> T:
         """
         Generate a structured output following a Pydantic model schema.
@@ -130,7 +154,34 @@ class OpenRouterService:
             **kwargs: Additional parameters to pass to the API
 
         Returns:
-            Instance of the provided Pydantic model
+            T: Instance of the provided Pydantic model
+
+        Raises:
+            ValueError: If the API key is missing
+            httpx.HTTPStatusError: If the API request fails
+            Exception: For other errors
+
+        Examples:
+            ```python
+            from pydantic import BaseModel
+
+            class WeatherResponse(BaseModel):
+                temperature: float
+                conditions: str
+                humidity: int
+
+            service = OpenRouterService(api_key="your-api-key")
+            messages = await MessageBuilder.build_messages(
+                prompt="What's the weather in Paris?",
+                system_prompt="Return structured data only."
+            )
+            result = await service.structured_output(
+                messages=messages,
+                schema_model=WeatherResponse,
+                model="openai/gpt-4o"
+            )
+            print(f"Temperature: {result.temperature}°C")
+            ```
         """
         # Get JSON schema from Pydantic model
         json_schema = schema_model.model_json_schema()
@@ -207,9 +258,15 @@ class OpenRouterService:
 
         Returns:
             str: The text between the opening and closing tags with strip() and lower() applied, or empty string if not found
-        """
-        import re
 
+        Examples:
+            ```python
+            service = OpenRouterService(api_key="your-api-key")
+            content = "<response><answer>Paris</answer><confidence>High</confidence></response>"
+            answer = service.extract_xml_tag(content, "answer")  # Returns "paris"
+            confidence = service.extract_xml_tag(content, "confidence")  # Returns "high"
+            ```
+        """
         # Create the pattern to match opening and closing tags
         pattern = f"<{tag_name}>(.*?)</{tag_name}>"
 

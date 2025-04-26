@@ -21,6 +21,8 @@ setup(
     author_email="marius.santiago.wilsch@gmail.com",
     url="https://github.com/MariusWilsch/openrouter-tools",
     packages=find_packages(),
+    package_data={"openrouter_tools": ["py.typed"]},
+    include_package_data=True,
     install_requires=[
         "httpx",
         "pydantic",

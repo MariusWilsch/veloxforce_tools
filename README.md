@@ -221,6 +221,42 @@ logger.error("This is an error message")
 
 By default, the package automatically configures logging at the INFO level. You can override this by setting the `LOG_LEVEL` environment variable.
 
+## Type Annotations and IDE Support
+
+OpenRouter Tools includes comprehensive type annotations to improve developer experience:
+
+- **Complete Type Hints**: All public methods and classes have detailed type annotations
+- **IDE Autocompletion**: Get suggestions for methods and parameters in your IDE
+- **Documentation in Code**: Rich docstrings with examples for all public methods
+- **Error Types**: Explicit documentation of possible exceptions
+- **py.typed Marker**: Ensures type checkers recognize the package's type annotations
+
+Example of type annotations in action:
+
+```python
+from openrouter_tools import OpenRouterService
+
+# Your IDE will show parameter hints and return types
+service = OpenRouterService(api_key="your-api-key")
+
+async def example():
+    # Your IDE will show parameter hints for this method
+    result = await service.chat_completion(
+        messages=[{"role": "user", "content": "Hello"}],
+        model="anthropic/claude-3-haiku",
+        temperature=0.7  # IDE shows this is a float parameter
+    )
+    # Your IDE knows this is a string
+    print(result.upper())
+```
+
+Benefits:
+
+- **Catch Errors Early**: Type checking helps identify issues before runtime
+- **Better Documentation**: Types serve as documentation for expected inputs and outputs
+- **Improved Refactoring**: IDEs can safely rename and refactor with type information
+- **Code Navigation**: Jump to definitions and find references more easily
+
 ## Integration with Existing Project
 
 ### Installation

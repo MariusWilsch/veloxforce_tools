@@ -1,6 +1,6 @@
 """OpenRouter Tools - A toolkit for working with OpenRouter and Langfuse APIs."""
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 # Initialize logging
 from openrouter_tools.core.logger import configure_logging

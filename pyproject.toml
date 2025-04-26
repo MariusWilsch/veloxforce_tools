@@ -4,13 +4,13 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "openrouter-tools"
-version = "0.3.0"
+version = "0.3.1"
 description = "Tools for working with OpenRouter and Langfuse APIs"
 authors = ["Marius Wilsch <marius.santiago.wilsch@gmail.com>"]
 readme = "README.md"
 license = "MIT"
 repository = "https://github.com/MariusWilsch/openrouter-tools"
-packages = [{include = "openrouter_tools"}]
+packages = [{include = "openrouter_tools", from = "."}, {include = "openrouter_tools/py.typed"}]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"
