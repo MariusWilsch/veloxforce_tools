@@ -46,7 +46,7 @@ class LangfuseService:
 
         # Initialize Langfuse client
         self.langfuse = Langfuse()
-        logger.info("Langfuse service initialized")
+        logger.debug("Langfuse service initialized")
 
     def get_text_prompt(self, prompt_name: str, label: str = "latest") -> Any:
         """
@@ -61,7 +61,7 @@ class LangfuseService:
         """
         try:
             prompt = self.langfuse.get_prompt(name=prompt_name, label=label)
-            logger.info(f"Retrieved text prompt '{prompt_name}' with label '{label}'")
+            logger.debug(f"Retrieved text prompt '{prompt_name}' with label '{label}'")
             return prompt
         except Exception as e:
             logger.error(f"Error retrieving text prompt '{prompt_name}': {e}")
@@ -82,7 +82,7 @@ class LangfuseService:
             prompt = self.langfuse.get_prompt(
                 name=prompt_name, label=label, type="chat"
             )
-            logger.info(f"Retrieved chat prompt '{prompt_name}' with label '{label}'")
+            logger.debug(f"Retrieved chat prompt '{prompt_name}' with label '{label}'")
             return prompt
         except Exception as e:
             logger.error(f"Error retrieving chat prompt '{prompt_name}': {e}")
@@ -101,6 +101,7 @@ class LangfuseService:
         """
         try:
             compiled_prompt = prompt.compile(**variables)
+            logger.debug(f"Compiled prompt with variables: {variables}")
             return compiled_prompt
         except Exception as e:
             logger.error(f"Error compiling prompt: {e}")
