@@ -258,14 +258,14 @@ class OpenRouterService:
             tag_name: The name of the XML tag to extract from
 
         Returns:
-            str: The text between the opening and closing tags with strip() and lower() applied, or empty string if not found
+            str: The text between the opening and closing tags with strip() applied, or empty string if not found
 
         Examples:
             ```python
             service = OpenRouterService(api_key="your-api-key")
             content = "<response><answer>Paris</answer><confidence>High</confidence></response>"
-            answer = service.extract_xml_tag(content, "answer")  # Returns "paris"
-            confidence = service.extract_xml_tag(content, "confidence")  # Returns "high"
+            answer = service.extract_xml_tag(content, "answer")  # Returns "Paris"
+            confidence = service.extract_xml_tag(content, "confidence")  # Returns "High"
             ```
         """
         # Create the pattern to match opening and closing tags
@@ -276,7 +276,7 @@ class OpenRouterService:
 
         if match:
             # Return the text between the tags (group 1)
-            return match.group(1).strip().lower()
+            return match.group(1).strip()
         else:
             logger.warning(f"Tag '{tag_name}' not found in content")
             return ""
