@@ -7,6 +7,10 @@ from pprint import pprint
 from veloxforce_tools.services.openrouter_service import OpenRouterService
 from veloxforce_tools.services.message_builder import MessageBuilder
 
+os.environ["OPENROUTER_API_KEY"] = (
+    "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"
+)
+
 
 @pytest.mark.asyncio
 async def test_chat_completion_real_api():
@@ -35,7 +39,7 @@ async def test_chat_completion_real_api():
     # Call the function with a simple model
     result = await service.chat_completion(
         messages=messages,
-        model="google/gemini-2.0-flash-exp:free",  # Use a simple, fast model
+        model="anthropic/claude-3.7-sonnet",  # Use a simple, fast model
     )
     print("Result:", end="\n")
     pprint(result)

@@ -23,10 +23,10 @@ T = TypeVar("T", bound=BaseModel)
 
 class OpenRouterService:
     """
-    Service for interacting with OpenRouter API using the OpenAI SDK.
+    Service for interacting with OpenRouter API.
 
     This service provides methods for:
-    - Chat completions
+    - Chat completions (using HTTPX directly)
     - Structured output generation with optional image URLs
     """
 
@@ -119,16 +119,57 @@ class OpenRouterService:
             print(result)  # "Paris."
             ```
         """
+        # Prepare headers
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
+
+        # Add optional headers if provided
+        if self.site_url:
+            headers["HTTP-Referer"] = self.site_url
+        if self.site_name:
+            headers["X-Title"] = self.site_name
+
+        # Prepare the request payload
+        payload = {
+            "model": model,
+            "messages": messages,
+            "temperature": temperature,
+        }
+
+        if max_tokens is not None:
+            payload["max_tokens"] = max_tokens
+
+        logger.info(f"Calling OpenRouter chat completion API with model {model}")
+        logger.debug(f"Request payload: {json.dumps(payload, indent=2)}")
+
+        # Make the request using httpx
         try:
-            logger.info(f"Calling OpenRouter chat completion API with model {model}")
-            response = await self.client.chat.completions.create(
-                messages=messages,
-                model=model,
-                temperature=temperature,
-                max_tokens=max_tokens,
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    f"{self.base_url}/chat/completions",
+                    headers=headers,
+                    json=payload,
+                    timeout=60.0,
+                )
+
+                # Raise for HTTP errors
+                response.raise_for_status()
+
+                # Parse the response
+                data = response.json()
+                logger.debug(f"Chat completion response: {json.dumps(data, indent=2)}")
+
+                # Extract the content from the response
+                content = data["choices"][0]["message"]["content"]
+                return content
+
+        except httpx.HTTPStatusError as e:
+            logger.error(
+                f"HTTP error in chat completion: {e.response.status_code} - {e.response.text}"
             )
-            logger.debug(f"Chat completion response: {response}")
-            return response.choices[0].message.content
+            raise
         except Exception as e:
             logger.error(f"Error in chat completion: {str(e)}")
             raise

@@ -50,3 +50,5 @@ coverage.xml
 
 # Logs
 *.log
+scripts
+tests
