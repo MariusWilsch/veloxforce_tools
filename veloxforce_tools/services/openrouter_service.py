@@ -44,7 +44,6 @@ class OpenRouterService:
                 "OpenRouter API key is required. Provide it directly or set OPENROUTER_API_KEY in environment variables or .env file."
             )
 
-        print(f"OpenRouter API key: {self.api_key}")
         self.helicone_api_key = helicone_api_key or settings.HELICONE_API_KEY
         if not self.helicone_api_key:
             raise ValueError(
