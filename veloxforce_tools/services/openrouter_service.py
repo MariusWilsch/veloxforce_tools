@@ -1,12 +1,7 @@
-import json
-import httpx
-import base64
-import re
+import json, httpx, re, os
 from typing import Optional, Dict, List, Type, TypeVar, Any, Union, Literal
 from pydantic import BaseModel
 from tenacity import retry, stop_after_attempt, wait_exponential
-from langfuse.openai import AsyncOpenAI
-from openai.types.chat import ChatCompletion, ChatCompletionMessageParam
 
 from veloxforce_tools.core.logger import get_logger
 from veloxforce_tools.core.settings import get_settings
@@ -32,49 +27,77 @@ class OpenRouterService:
 
     def __init__(
         self,
-        api_key: Optional[str] = None,
-        base_url: str = "https://openrouter.ai/api/v1",
-        site_url: Optional[str] = None,
-        site_name: Optional[str] = None,
     ):
         """
         Initialize the OpenRouter service.
-
-        Args:
-            api_key: OpenRouter API key (if None, uses OPENROUTER_API_KEY from settings)
-            base_url: OpenRouter API base URL
-            site_url: Site URL for HTTP-Referer header
-            site_name: Site name for X-Title header
         """
-        self.api_key = api_key or settings.OPENROUTER_API_KEY
+        settings = get_settings()
+        self.api_key = settings.OPENROUTER_API_KEY
         if not self.api_key:
             raise ValueError(
                 "OpenRouter API key is required. Provide it directly or set OPENROUTER_API_KEY in environment variables or .env file."
             )
 
-        self.base_url = base_url
-        self.site_url = site_url
-        self.site_name = site_name
-        self.client = self._create_client()
+        self.helicone_api_key = settings.HELICONE_API_KEY
+        if not self.helicone_api_key:
+            raise ValueError(
+                "Helicone API key is required. Provide it directly or set HELICONE_API_KEY in environment variables or .env file."
+            )
 
-    def _create_client(self) -> AsyncOpenAI:
+        # Use the direct OpenRouter API URL
+        self.base_url = "https://openrouter.helicone.ai/api/v1"
+
+    async def _make_api_request(
+        self,
+        endpoint: str,
+        payload: Dict[str, Any],
+    ) -> Dict[str, Any]:
         """
-        Create an AsyncOpenAI client configured for OpenRouter.
+        Make an API request to OpenRouter.
+
+        Args:
+            endpoint: API endpoint (e.g., "chat/completions")
+            payload: Request payload
 
         Returns:
-            AsyncOpenAI client instance
-        """
-        extra_headers = {}
-        if self.site_url:
-            extra_headers["HTTP-Referer"] = self.site_url
-        if self.site_name:
-            extra_headers["X-Title"] = self.site_name
+            Dict[str, Any]: API response
 
-        return AsyncOpenAI(
-            base_url=self.base_url,
-            api_key=self.api_key,
-            default_headers=extra_headers,
-        )
+        Raises:
+            httpx.HTTPStatusError: If the API request fails
+            Exception: For other errors
+        """
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Helicone-Auth": f"Bearer {self.helicone_api_key}",
+            "Content-Type": "application/json",
+        }
+
+        logger.debug(f"Request payload: {json.dumps(payload, indent=2)}")
+
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    f"{self.base_url}/{endpoint}",
+                    headers=headers,
+                    json=payload,
+                    timeout=60.0,
+                )
+
+                # Raise for HTTP errors
+                response.raise_for_status()
+
+                # Parse the response
+                data = response.json()
+                logger.debug(f"API response: {json.dumps(data, indent=2)}")
+                return data
+        except httpx.HTTPStatusError as e:
+            logger.error(
+                f"HTTP error in API request: {e.response.status_code} - {e.response.text}"
+            )
+            raise
+        except Exception as e:
+            logger.error(f"Error in API request: {str(e)}")
+            raise
 
     @retry(
         stop=stop_after_attempt(MAX_RETRIES),
@@ -119,19 +142,6 @@ class OpenRouterService:
             print(result)  # "Paris."
             ```
         """
-        # Prepare headers
-        headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json",
-        }
-
-        # Add optional headers if provided
-        if self.site_url:
-            headers["HTTP-Referer"] = self.site_url
-        if self.site_name:
-            headers["X-Title"] = self.site_name
-
-        # Prepare the request payload
         payload = {
             "model": model,
             "messages": messages,
@@ -142,37 +152,9 @@ class OpenRouterService:
             payload["max_tokens"] = max_tokens
 
         logger.info(f"Calling OpenRouter chat completion API with model {model}")
-        logger.debug(f"Request payload: {json.dumps(payload, indent=2)}")
 
-        # Make the request using httpx
-        try:
-            async with httpx.AsyncClient() as client:
-                response = await client.post(
-                    f"{self.base_url}/chat/completions",
-                    headers=headers,
-                    json=payload,
-                    timeout=60.0,
-                )
-
-                # Raise for HTTP errors
-                response.raise_for_status()
-
-                # Parse the response
-                data = response.json()
-                logger.debug(f"Chat completion response: {json.dumps(data, indent=2)}")
-
-                # Extract the content from the response
-                content = data["choices"][0]["message"]["content"]
-                return content
-
-        except httpx.HTTPStatusError as e:
-            logger.error(
-                f"HTTP error in chat completion: {e.response.status_code} - {e.response.text}"
-            )
-            raise
-        except Exception as e:
-            logger.error(f"Error in chat completion: {str(e)}")
-            raise
+        data = await self._make_api_request("chat/completions", payload)
+        return data["choices"][0]["message"]["content"]
 
     @retry(
         stop=stop_after_attempt(MAX_RETRIES),
@@ -248,47 +230,14 @@ class OpenRouterService:
         # Add any additional parameters
         payload.update(kwargs)
 
-        # Prepare headers
-        headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json",
-        }
+        logger.info(f"Calling OpenRouter structured output API with model {model}")
 
-        logger.info(
-            f"Calling OpenRouter with messages: \n|{json.dumps(messages, indent=2)}|"
-        )
-
-        # Make the request using httpx
-        try:
-            async with httpx.AsyncClient() as client:
-                response = await client.post(
-                    f"{self.base_url}/chat/completions",
-                    headers=headers,
-                    json=payload,
-                    timeout=60.0,
-                )
-
-                # Raise for HTTP errors
-                response.raise_for_status()
-
-                # Parse the response
-                data = response.json()
-                # Extract the content from the response
-                content = data["choices"][0]["message"]["content"]
-                # Create and return an instance of the schema_model
-                logger.info(f"Structured output: \n|{content}|")
-                return content
-                # TODO: Use pydantic to validate the content
-                # return schema_model.model_validate(content)
-
-        except httpx.HTTPStatusError as e:
-            logger.error(
-                f"HTTP error in structured output: {e.response.status_code} - {e.response.text}"
-            )
-            raise
-        except Exception as e:
-            logger.error(f"Error in structured output: {str(e)}")
-            raise
+        data = await self._make_api_request("chat/completions", payload)
+        content = data["choices"][0]["message"]["content"]
+        logger.info(f"Structured output: \n|{content}|")
+        return content
+        # TODO: Use pydantic to validate the content
+        # return schema_model.model_validate(content)
 
     def extract_xml_tag(self, content: str, tag_name: str) -> str:
         """

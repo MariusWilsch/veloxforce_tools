@@ -22,6 +22,7 @@ pydantic-settings = "*"
 openai = "^1.76.0"
 langfuse = "^2.60.3"
 imap-tools = "^1.0.0"
+python-dotenv = "^1.1.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"

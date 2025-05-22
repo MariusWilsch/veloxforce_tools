@@ -3,13 +3,13 @@ import asyncio
 import os
 import base64
 from pprint import pprint
+from dotenv import load_dotenv
 
 from veloxforce_tools.services.openrouter_service import OpenRouterService
 from veloxforce_tools.services.message_builder import MessageBuilder
 
-os.environ["OPENROUTER_API_KEY"] = (
-    "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"
-)
+# Load environment variables from .env file
+load_dotenv()
 
 
 @pytest.mark.asyncio
@@ -26,7 +26,7 @@ async def test_chat_completion_real_api():
         pytest.skip("OPENROUTER_API_KEY environment variable not set")
 
     # Create the service with the real API key
-    service = OpenRouterService(api_key=api_key)
+    service = OpenRouterService()
 
     # Create a simple message
     messages = await MessageBuilder.build_messages(
@@ -39,7 +39,7 @@ async def test_chat_completion_real_api():
     # Call the function with a simple model
     result = await service.chat_completion(
         messages=messages,
-        model="anthropic/claude-3.7-sonnet",  # Use a simple, fast model
+        model="deepseek/deepseek-chat-v3-0324:free",  # Use a simple, fast model
     )
     print("Result:", end="\n")
     pprint(result)
@@ -63,7 +63,7 @@ async def test_chat_completion_with_image_url():
         pytest.skip("OPENROUTER_API_KEY environment variable not set")
 
     # Create the service with the real API key
-    service = OpenRouterService(api_key=api_key)
+    service = OpenRouterService()
 
     # Use a publicly available image URL
     image_url = "https://picsum.photos/800/600"  # Random image from Lorem Picsum
@@ -79,7 +79,7 @@ async def test_chat_completion_with_image_url():
     # Call the function with a model that supports image input
     result = await service.chat_completion(
         messages=messages,
-        model="google/gemini-2.0-flash-exp:free",  # Use a model that supports image input
+        model="deepseek/deepseek-chat-v3-0324:free",  # Use a model that supports image input
     )
     print("Image description result:", end="\n")
     pprint(result)
@@ -107,7 +107,7 @@ async def test_chat_completion_with_pdf():
         pytest.skip("OPENROUTER_API_KEY environment variable not set")
 
     # Create the service with the real API key
-    service = OpenRouterService(api_key=api_key)
+    service = OpenRouterService()
 
     # Read and encode the PDF file
     pdf_path = os.path.join(
@@ -136,7 +136,7 @@ async def test_chat_completion_with_pdf():
     # Call the function with a model that supports PDF input
     result = await service.chat_completion(
         messages=messages,
-        model="google/gemini-2.5-flash-preview:thinking",  # Use a model that supports PDF input
+        model="deepseek/deepseek-chat-v3-0324:free",  # Use a model that supports PDF input
     )
     print("PDF summary result:", end="\n")
     pprint(result)

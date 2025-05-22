@@ -18,10 +18,16 @@ class Settings(BaseSettings):
 
     # Environment: DEVELOPMENT or PRODUCTION
     ENV: Literal["DEVELOPMENT", "PRODUCTION"] = "DEVELOPMENT"
-
     LOG_LEVEL: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
 
-    OPENROUTER_API_KEY: Optional[str] = None
+    # * =========== OpenRouter Service ========== *#
+    OPENROUTER_API_KEY: str
+    HELICONE_API_KEY: str
+
+    # * =========== Langfuse Service ========== *#
+    LANGFUSE_PUBLIC_KEY: str
+    LANGFUSE_SECRET_KEY: str
+    LANGFUSE_HOST: str
 
     MAX_RETRIES: int = 3
 

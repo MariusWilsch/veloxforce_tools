@@ -9,7 +9,6 @@ from veloxforce_tools.core.settings import get_settings
 logger = get_logger(__name__)
 
 # Get settings
-settings = get_settings()
 
 
 class LangfuseService:
@@ -24,9 +23,6 @@ class LangfuseService:
 
     def __init__(
         self,
-        public_key: Optional[str] = None,
-        secret_key: Optional[str] = None,
-        host: Optional[str] = None,
     ):
         """
         Initialize the Langfuse service.
@@ -36,13 +32,11 @@ class LangfuseService:
             secret_key: Langfuse secret key (if None, uses LANGFUSE_SECRET_KEY env var)
             host: Optional Langfuse host URL
         """
+        settings = get_settings()
         # Set environment variables if keys are provided
-        if public_key:
-            os.environ["LANGFUSE_PUBLIC_KEY"] = public_key
-        if secret_key:
-            os.environ["LANGFUSE_SECRET_KEY"] = secret_key
-        if host:
-            os.environ["LANGFUSE_HOST"] = host
+        os.environ["LANGFUSE_PUBLIC_KEY"] = settings.LANGFUSE_PUBLIC_KEY
+        os.environ["LANGFUSE_SECRET_KEY"] = settings.LANGFUSE_SECRET_KEY
+        os.environ["LANGFUSE_HOST"] = settings.LANGFUSE_HOST
 
         # Initialize Langfuse client
         self.langfuse = Langfuse()
