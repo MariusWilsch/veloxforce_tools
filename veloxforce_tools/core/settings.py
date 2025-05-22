@@ -27,7 +27,6 @@ class Settings(BaseSettings):
     # * =========== Langfuse Service ========== *#
     LANGFUSE_PUBLIC_KEY: str
     LANGFUSE_SECRET_KEY: str
-    LANGFUSE_HOST: str
 
     MAX_RETRIES: int = 3
 

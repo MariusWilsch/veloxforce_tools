@@ -214,7 +214,19 @@ When using Veloxforce Tools as a package in other projects, you have two options
 1. **Environment Variables**: Set the required environment variables in your main project
 2. **Direct Configuration**: Pass API keys directly to the service constructors
 
-Example with direct configuration:
+#### How Environment Variables Work
+
+When Veloxforce Tools is used as a dependency in another project:
+
+- The package looks for environment variables in the **host project's environment**, not in the package's own directory
+- If environment variables aren't found directly, it will look for a **.env file in the host project's root directory**
+- The package will **never use the .env file from inside the package itself**
+
+This means each project using Veloxforce Tools can have its own configuration without affecting other projects.
+
+#### Configuration Examples
+
+Example with direct configuration (most explicit):
 ```python
 from veloxforce_tools import OpenRouterService
 
@@ -222,7 +234,15 @@ from veloxforce_tools import OpenRouterService
 service = OpenRouterService(api_key="your-api-key")
 ```
 
-Example with environment variables:
+Example with environment variables from .env file (recommended):
+```python
+from veloxforce_tools import OpenRouterService
+
+# Will automatically use OPENROUTER_API_KEY from the host project's .env file
+service = OpenRouterService()
+```
+
+Example with environment variables from code:
 ```python
 import os
 from veloxforce_tools import OpenRouterService

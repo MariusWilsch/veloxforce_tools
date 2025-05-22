@@ -27,18 +27,24 @@ class OpenRouterService:
 
     def __init__(
         self,
+        openrouter_api_key: Optional[str] = None,
+        helicone_api_key: Optional[str] = None,
     ):
         """
         Initialize the OpenRouter service.
+
+        Args:
+            openrouter_api_key: OpenRouter API key (if None, uses OPENROUTER_API_KEY env var)
+            helicone_api_key: Helicone API key (if None, uses HELICONE_API_KEY env var)
         """
         settings = get_settings()
-        self.api_key = settings.OPENROUTER_API_KEY
+        self.api_key = openrouter_api_key or settings.OPENROUTER_API_KEY
         if not self.api_key:
             raise ValueError(
                 "OpenRouter API key is required. Provide it directly or set OPENROUTER_API_KEY in environment variables or .env file."
             )
 
-        self.helicone_api_key = settings.HELICONE_API_KEY
+        self.helicone_api_key = helicone_api_key or settings.HELICONE_API_KEY
         if not self.helicone_api_key:
             raise ValueError(
                 "Helicone API key is required. Provide it directly or set HELICONE_API_KEY in environment variables or .env file."

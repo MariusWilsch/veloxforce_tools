@@ -23,6 +23,8 @@ class LangfuseService:
 
     def __init__(
         self,
+        public_key: Optional[str] = None,
+        secret_key: Optional[str] = None,
     ):
         """
         Initialize the Langfuse service.
@@ -34,9 +36,12 @@ class LangfuseService:
         """
         settings = get_settings()
         # Set environment variables if keys are provided
-        os.environ["LANGFUSE_PUBLIC_KEY"] = settings.LANGFUSE_PUBLIC_KEY
-        os.environ["LANGFUSE_SECRET_KEY"] = settings.LANGFUSE_SECRET_KEY
-        os.environ["LANGFUSE_HOST"] = settings.LANGFUSE_HOST
+        os.environ["LANGFUSE_PUBLIC_KEY"] = (
+            public_key or settings.LANGFUSE_PUBLIC_KEY
+        )
+        os.environ["LANGFUSE_SECRET_KEY"] = (
+            secret_key or settings.LANGFUSE_SECRET_KEY
+        )
 
         # Initialize Langfuse client
         self.langfuse = Langfuse()
