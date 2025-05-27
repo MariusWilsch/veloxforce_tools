@@ -9,7 +9,7 @@ and listing folders.
 import ssl
 from typing import List, Optional, Any, Callable, TypeVar, Dict
 
-from imap_tools import MailBox, A, MailMessage
+from imap_tools import MailBox, A, MailMessage, Header
 from veloxforce_tools.core.logger import get_logger
 
 logger = get_logger(__name__)
@@ -103,6 +103,66 @@ class EmailService:
             return await self.execute_with_mailbox(_operation)
         except Exception as e:
             logger.error(f"Error fetching emails by ID: {e}", exc_info=True)
+            return []
+
+    async def fetch_emails_by_message_ids(
+        self, message_ids: List[str]
+    ) -> List[MailMessage]:
+        """Fetch emails by their Message-ID headers.
+
+        Args:
+            message_ids: List of message IDs to fetch (with or without angle brackets)
+
+        Returns:
+            List of MailMessage objects
+        """
+        if not message_ids:
+            return []
+
+        logger.info(f"Fetching {len(message_ids)} emails by Message-ID")
+
+        def _operation(mailbox: MailBox) -> List[MailMessage]:
+            messages = []
+
+            for message_id in message_ids:
+                # Ensure message ID has angle brackets for proper IMAP search
+                formatted_message_id = (
+                    message_id if message_id.startswith("<") else f"<{message_id}>"
+                )
+                if not formatted_message_id.endswith(">"):
+                    formatted_message_id += ">"
+
+                logger.debug(f"Searching for message ID: {formatted_message_id}")
+
+                # Search for emails with this specific message ID using Header class
+                try:
+                    found_messages = list(
+                        mailbox.fetch(
+                            A(header=Header("Message-ID", formatted_message_id))
+                        )
+                    )
+                    if found_messages:
+                        messages.extend(found_messages)
+                        logger.debug(
+                            f"Found {len(found_messages)} email(s) for message ID {formatted_message_id}"
+                        )
+                    else:
+                        logger.warning(
+                            f"No email found for message ID: {formatted_message_id}"
+                        )
+                except Exception as e:
+                    logger.error(
+                        f"Error searching for message ID {formatted_message_id}: {e}"
+                    )
+                    continue
+
+            logger.info(f"Successfully fetched {len(messages)} emails by Message-ID")
+            return messages
+
+        try:
+            return await self.execute_with_mailbox(_operation)
+        except Exception as e:
+            logger.error(f"Error fetching emails by Message-ID: {e}", exc_info=True)
             return []
 
     async def move_email_to_folder(self, email_id: str, target_folder: str) -> bool:

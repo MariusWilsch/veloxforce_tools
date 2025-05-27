@@ -36,6 +36,12 @@ email_service = EmailService(
 # Fetch emails by their IDs
 emails = await email_service.fetch_emails_by_ids(["123", "456"])
 
+# Fetch emails by their Message-ID headers
+emails = await email_service.fetch_emails_by_message_ids([
+    "message-id-1@example.com",
+    "<message-id-2@example.com>"
+])
+
 # Move an email to a different folder
 success = await email_service.move_email_to_folder("123", "Processed")
 
