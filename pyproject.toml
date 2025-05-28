@@ -10,7 +10,8 @@ authors = ["Marius Wilsch <marius.santiago.wilsch@gmail.com>"]
 readme = "README.md"
 license = "MIT"
 repository = "https://github.com/MariusWilsch/veloxforce-tools"
-packages = [{include = "veloxforce_tools", from = "."}, {include = "veloxforce_tools/py.typed"}]
+packages = [{include = "veloxforce_tools"}]
+include = ["veloxforce_tools/py.typed"]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<4.0"

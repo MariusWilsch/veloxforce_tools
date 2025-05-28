@@ -7,10 +7,11 @@ from veloxforce_tools.core.logger import configure_logging
 
 configure_logging()
 
-# Initialize settings
+# Import services with explicit typing
 from veloxforce_tools.services.message_builder import MessageBuilder
 from veloxforce_tools.services.openrouter_service import OpenRouterService
 from veloxforce_tools.services.langfuse_service import LangfuseService
 from veloxforce_tools.services.email_service import EmailService
 
+# Export all public classes
 __all__ = ["MessageBuilder", "OpenRouterService", "LangfuseService", "EmailService"]

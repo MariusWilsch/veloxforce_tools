@@ -1,5 +1,8 @@
-import json, httpx, re, os
-from typing import Optional, Dict, List, Type, TypeVar, Any, Union, Literal
+import json
+import re
+from typing import Optional, Dict, List, Type, TypeVar, Any
+
+import httpx
 from pydantic import BaseModel
 from tenacity import retry, stop_after_attempt, wait_exponential
 
@@ -24,6 +27,12 @@ class OpenRouterService:
     - Chat completions (using HTTPX directly)
     - Structured output generation with optional image URLs
     """
+
+    # Type annotations for instance attributes
+    api_key: str
+    helicone_api_key: str
+    project_id: Optional[str]
+    base_url: str
 
     def __init__(
         self,
