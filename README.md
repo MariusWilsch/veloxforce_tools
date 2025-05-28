@@ -75,14 +75,14 @@ messages = MessageBuilder.build_messages(
 
 ### OpenRouterService
 
-Handles communication with the OpenRouter API:
+Handles communication with the OpenRouter API with Helicone tracking:
 
 ```python
 # Initialize the service
 openrouter_service = OpenRouterService(
-    api_key="your_api_key",
-    site_url="your_site_url",  # Optional
-    site_name="your_site_name"  # Optional
+    openrouter_api_key="your_api_key",
+    helicone_api_key="your_helicone_key",
+    project_id="my-project-name"  # Optional: for project tracking in Helicone
 )
 
 # Simple chat completion
@@ -97,6 +97,20 @@ result = openrouter_service.structured_output(
     schema_model=YourPydanticModel,
     model="anthropic/claude-3-opus"
 )
+```
+
+#### Helicone Project Tracking
+
+The `project_id` parameter enables project-level tracking in Helicone:
+
+```python
+# Different projects can have different project IDs
+email_service = OpenRouterService(project_id="email-processor")
+document_service = OpenRouterService(project_id="document-analyzer")
+chat_service = OpenRouterService(project_id="customer-chat")
+
+# All requests from each service will be tagged with their respective project ID
+# This allows you to track costs and usage per project in Helicone dashboard
 ```
 
 ### LangfuseService
@@ -183,6 +197,7 @@ ENV=DEVELOPMENT
 
 # API Keys
 OPENROUTER_API_KEY=your_openrouter_api_key_here
+HELICONE_API_KEY=your_helicone_api_key_here
 
 # Optional: Langfuse API Keys (if using Langfuse)
 # LANGFUSE_PUBLIC_KEY=your_langfuse_public_key_here
@@ -268,6 +283,7 @@ service = OpenRouterService(api_key=os.environ.get("OPENROUTER_API_KEY"))
 |---------------------|-------------|---------|
 | ENV | Environment (DEVELOPMENT or PRODUCTION) | DEVELOPMENT |
 | OPENROUTER_API_KEY | Your OpenRouter API key | None |
+| HELICONE_API_KEY | Your Helicone API key for request tracking | None |
 | LANGFUSE_PUBLIC_KEY | Your Langfuse public key | None |
 | LANGFUSE_SECRET_KEY | Your Langfuse secret key | None |
 | IMAP_SERVER | IMAP server address for EmailService | None |

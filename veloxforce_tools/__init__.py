@@ -1,6 +1,6 @@
 """Veloxforce Tools - A toolkit for working with OpenRouter, Langfuse, and Email APIs."""
 
-__version__ = "0.4.1"
+__version__ = "0.4.3"
 
 # Initialize logging
 from veloxforce_tools.core.logger import configure_logging

@@ -29,6 +29,7 @@ class OpenRouterService:
         self,
         openrouter_api_key: Optional[str] = None,
         helicone_api_key: Optional[str] = None,
+        project_id: Optional[str] = None,
     ):
         """
         Initialize the OpenRouter service.
@@ -36,6 +37,7 @@ class OpenRouterService:
         Args:
             openrouter_api_key: OpenRouter API key (if None, uses OPENROUTER_API_KEY env var)
             helicone_api_key: Helicone API key (if None, uses HELICONE_API_KEY env var)
+            project_id: Project ID for Helicone tracking (typically project name)
         """
         settings = get_settings()
         self.api_key = openrouter_api_key or settings.OPENROUTER_API_KEY
@@ -49,6 +51,9 @@ class OpenRouterService:
             raise ValueError(
                 "Helicone API key is required. Provide it directly or set HELICONE_API_KEY in environment variables or .env file."
             )
+
+        # Store project ID for Helicone tracking
+        self.project_id = project_id
 
         # Use the direct OpenRouter API URL
         self.base_url = "https://openrouter.helicone.ai/api/v1"
@@ -77,6 +82,10 @@ class OpenRouterService:
             "Helicone-Auth": f"Bearer {self.helicone_api_key}",
             "Content-Type": "application/json",
         }
+
+        # Add project ID for Helicone tracking if provided
+        if self.project_id:
+            headers["Helicone-Property-Project"] = self.project_id
 
         logger.debug(f"Request payload: {json.dumps(payload, indent=2)}")
 
@@ -136,7 +145,10 @@ class OpenRouterService:
 
         Examples:
             ```python
-            service = OpenRouterService(api_key="your-api-key")
+            service = OpenRouterService(
+                openrouter_api_key="your-api-key",
+                project_id="my-project-name"
+            )
             messages = await MessageBuilder.build_messages(
                 prompt="What is the capital of France?",
                 system_prompt="Be concise."
@@ -200,7 +212,10 @@ class OpenRouterService:
                 conditions: str
                 humidity: int
 
-            service = OpenRouterService(api_key="your-api-key")
+            service = OpenRouterService(
+                openrouter_api_key="your-api-key",
+                project_id="weather-app"
+            )
             messages = await MessageBuilder.build_messages(
                 prompt="What's the weather in Paris?",
                 system_prompt="Return structured data only."
@@ -258,7 +273,10 @@ class OpenRouterService:
 
         Examples:
             ```python
-            service = OpenRouterService(api_key="your-api-key")
+            service = OpenRouterService(
+                openrouter_api_key="your-api-key",
+                project_id="xml-parser"
+            )
             content = "<response><answer>Paris</answer><confidence>High</confidence></response>"
             answer = service.extract_xml_tag(content, "answer")  # Returns "Paris"
             confidence = service.extract_xml_tag(content, "confidence")  # Returns "High"

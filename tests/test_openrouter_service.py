@@ -50,6 +50,43 @@ async def test_chat_completion_real_api():
 
 
 @pytest.mark.asyncio
+async def test_chat_completion_with_project_id():
+    """
+    Test that chat_completion works with project_id for project tracking.
+    This test uses the real API client to make an actual request with project tracking.
+
+    Note: This test requires a valid OPENROUTER_API_KEY environment variable.
+    """
+    # Skip the test if no API key is provided
+    api_key = os.environ.get("OPENROUTER_API_KEY")
+    if not api_key:
+        pytest.skip("OPENROUTER_API_KEY environment variable not set")
+
+    # Create the service with project_id for project tracking
+    service = OpenRouterService(project_id="test-project")
+
+    # Create a simple message
+    messages = await MessageBuilder.build_messages(
+        prompt="What is 2+2? Answer in one word."
+    )
+
+    print("Messages with project tracking:", end="\n")
+    pprint(messages)
+
+    # Call the function with a simple model
+    result = await service.chat_completion(
+        messages=messages,
+        model="anthropic/claude-3.7-sonnet",  # Use a simple, fast model
+    )
+    print("Result with project tracking:", end="\n")
+    pprint(result)
+
+    # Assert we get a non-empty response
+    assert result
+    assert isinstance(result, str)
+
+
+@pytest.mark.asyncio
 async def test_chat_completion_with_image_url():
     """
     Test that chat_completion works with image URLs.

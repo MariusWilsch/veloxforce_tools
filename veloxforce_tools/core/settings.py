@@ -25,8 +25,8 @@ class Settings(BaseSettings):
     HELICONE_API_KEY: str
 
     # * =========== Langfuse Service ========== *#
-    LANGFUSE_PUBLIC_KEY: str
-    LANGFUSE_SECRET_KEY: str
+    LANGFUSE_PUBLIC_KEY: Optional[str] = None
+    LANGFUSE_SECRET_KEY: Optional[str] = None
 
     MAX_RETRIES: int = 3
 

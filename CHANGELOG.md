@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.3] - 2025-05-02
+
+### Added
+- Added `project_id` parameter to OpenRouterService for Helicone project tracking
+- Enables project-level differentiation and cost tracking in Helicone dashboard
+- Added `Helicone-Property-Project` header support for request grouping
+- Added comprehensive test for project tracking functionality
+- Updated documentation with Helicone project tracking examples
+
+### Changed
+- Made LANGFUSE_PUBLIC_KEY and LANGFUSE_SECRET_KEY optional in settings
+- Updated all service examples to include project_id parameter
+- Enhanced README with Helicone integration documentation
+
 ## [0.4.2] - 2025-05-02
 
 ### Fixed

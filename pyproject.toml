@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "veloxforce-tools"
-version = "0.4.0"
+version = "0.4.3"
 description = "Veloxforce Tools - A toolkit for working with OpenRouter, Langfuse, and Email APIs"
 authors = ["Marius Wilsch <marius.santiago.wilsch@gmail.com>"]
 readme = "README.md"
