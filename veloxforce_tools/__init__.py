@@ -1,6 +1,6 @@
 """Veloxforce Tools - A toolkit for working with OpenRouter, Langfuse, and Email APIs."""
 
-__version__ = "0.4.3"
+__version__ = "0.4.4"
 
 # Initialize logging
 from veloxforce_tools.core.logger import configure_logging
@@ -13,5 +13,14 @@ from veloxforce_tools.services.openrouter_service import OpenRouterService
 from veloxforce_tools.services.langfuse_service import LangfuseService
 from veloxforce_tools.services.email_service import EmailService
 
+# Import common schemas
+from veloxforce_tools.schemas.common import AIBooleanResponse
+
 # Export all public classes
-__all__ = ["MessageBuilder", "OpenRouterService", "LangfuseService", "EmailService"]
+__all__ = [
+    "MessageBuilder",
+    "OpenRouterService",
+    "LangfuseService",
+    "EmailService",
+    "AIBooleanResponse",
+]

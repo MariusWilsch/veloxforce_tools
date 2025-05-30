@@ -7,5 +7,13 @@ from veloxforce_tools.schemas.openrouter import (
     FileContent,
     ContentItem,
 )
+from veloxforce_tools.schemas.common import AIBooleanResponse
 
-__all__ = ["Message", "TextContent", "ImageUrlContent", "FileContent", "ContentItem"]
+__all__ = [
+    "Message",
+    "TextContent",
+    "ImageUrlContent",
+    "FileContent",
+    "ContentItem",
+    "AIBooleanResponse",
+]

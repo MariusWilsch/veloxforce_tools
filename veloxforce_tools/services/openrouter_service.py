@@ -303,3 +303,48 @@ class OpenRouterService:
         else:
             logger.warning(f"Tag '{tag_name}' not found in content")
             return ""
+
+    def extract_xml_boolean(self, content: str) -> bool:
+        """
+        Extract boolean value from standardized <boolean> XML tag.
+
+        Expects AI responses to use 0 for False and 1 for True in <boolean> tags.
+        This method provides a standardized way to handle boolean responses across all projects.
+
+        Args:
+            content: The string containing the <boolean> XML tag
+
+        Returns:
+            bool: True if the tag contains "1", False if it contains "0" or is missing
+
+        Examples:
+            ```python
+            service = OpenRouterService(
+                openrouter_api_key="your-api-key",
+                project_id="boolean-parser"
+            )
+
+            # AI response: "<boolean>1</boolean>"
+            result = service.extract_xml_boolean(response)  # Returns True
+
+            # AI response: "<boolean>0</boolean>"
+            result = service.extract_xml_boolean(response)  # Returns False
+
+            # Missing tag or invalid content
+            result = service.extract_xml_boolean(response)  # Returns False
+            ```
+
+        Note:
+            Always use this method for boolean AI responses. Configure your prompts to respond with:
+            "Respond with 1 if condition is true, 0 if false: <boolean>1</boolean>"
+        """
+        value = self.extract_xml_tag(content, "boolean")
+
+        # Convert to boolean: "1" is True, anything else is False
+        try:
+            return bool(int(value)) if value.isdigit() else False
+        except (ValueError, TypeError):
+            logger.warning(
+                f"Invalid boolean value in <boolean> tag: '{value}', defaulting to False"
+            )
+            return False
